@@ -1,0 +1,7 @@
+(executables
+ (names wiki_game)
+ (libraries
+  core
+  core_unix.command_unix
+  wiki_game_lib))
+

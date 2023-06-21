@@ -1,0 +1,333 @@
+* wiki_game.exe
+
+: A tool for playing the wikipedia game, and other utilities
+: 
+:   wiki_game.exe SUBCOMMAND
+: 
+: === subcommands ===
+: 
+:   file-fetcher-demo          . Demo showing usage of [File_fetcher] to fetch a
+:                                resource, either locally or remotely, and print
+:                                it to stdout
+:   imdb                       . imdb commands
+:   interstate                 . interstate highway commands
+:   lambda-soup-utilities      . lambda soup demo
+:   maze                       . maze commands
+:   social-network             . social network demo
+:   wiki-game                  . wikipedia game commands
+:   version                    . print version information
+:   help                       . explain a given subcommand (perhaps recursively)
+
+** version
+
+: print version information
+: 
+:   wiki_game.exe version 
+: 
+: === flags ===
+: 
+:   [-build-info]              . print build info for this build
+:   [-version]                 . print the version of this build
+:   [-help], -?                . print this help text and exit
+
+** file-fetcher-demo
+
+: Demo showing usage of [File_fetcher] to fetch a resource, either locally or remotely, and print it to stdout
+: 
+:   wiki_game.exe file-fetcher-demo 
+: 
+: === flags ===
+: 
+:   -resource RESOURCE         . the resource to fetch
+:   [-local-with-root PATH]    . read files from disk instead of requesting via
+:                                HTTP; all resource paths will be relative to the
+:                                provided root
+:   [-help], -?                . print this help text and exit
+
+** imdb
+
+: imdb commands
+: 
+:   wiki_game.exe imdb SUBCOMMAND
+: 
+: === subcommands ===
+: 
+:   print-credits              . given an IMDB page for an actor, print out a list
+:                                of their main credits
+:   help                       . explain a given subcommand (perhaps recursively)
+
+*** print-credits
+
+: given an IMDB page for an actor, print out a list of their main credits
+: 
+:   wiki_game.exe imdb print-credits 
+: 
+: === flags ===
+: 
+:   -resource RESOURCE         . the resource to fetch
+:   [-local-with-root PATH]    . read files from disk instead of requesting via
+:                                HTTP; all resource paths will be relative to the
+:                                provided root
+:   [-help], -?                . print this help text and exit
+
+** interstate
+
+: interstate highway commands
+: 
+:   wiki_game.exe interstate SUBCOMMAND
+: 
+: === subcommands ===
+: 
+:   load                       . parse a file listing interstates and serialize
+:                                graph as a sexp
+:   visualize                  . parse a file listing interstates and generate a
+:                                graph visualizing the highway network
+:   help                       . explain a given subcommand (perhaps recursively)
+
+*** load
+
+: parse a file listing interstates and serialize graph as a sexp
+: 
+:   wiki_game.exe interstate load 
+: 
+: === flags ===
+: 
+:   -input FILE                . a file listing interstates and the cities they go
+:                                through
+:   [-help], -?                . print this help text and exit
+
+*** visualize
+
+: parse a file listing interstates and generate a graph visualizing the highway network
+: 
+:   wiki_game.exe interstate visualize 
+: 
+: === flags ===
+: 
+:   -input FILE                . a file listing all interstates and the cities
+:                                they go through
+:   -output FILE               . where to write generated graph
+:   [-help], -?                . print this help text and exit
+
+** lambda-soup-utilities
+
+: lambda soup demo
+: 
+:   wiki_game.exe lambda-soup-utilities SUBCOMMAND
+: 
+: === subcommands ===
+: 
+:   print-bolded-text          . print all bolded text in an HTML page
+:   print-first-item-of-all-unordered-lists
+:                              . print the first item of each unordered list from
+:                                an HTML page
+:   print-first-item-of-second-unordered-list
+:                              . print first item of the second unordered list of
+:                                an HTML page
+:   print-list-items           . print all list items from an HTML page
+:   print-title                . print the title from an HTML page
+:   help                       . explain a given subcommand (perhaps recursively)
+
+*** print-bolded-text
+
+: print all bolded text in an HTML page
+: 
+:   wiki_game.exe lambda-soup-utilities print-bolded-text 
+: 
+: === flags ===
+: 
+:   -resource RESOURCE         . the resource to fetch
+:   [-local-with-root PATH]    . read files from disk instead of requesting via
+:                                HTTP; all resource paths will be relative to the
+:                                provided root
+:   [-help], -?                . print this help text and exit
+
+*** print-first-item-of-all-unordered-lists
+
+: print the first item of each unordered list from an HTML page
+: 
+:   wiki_game.exe lambda-soup-utilities print-first-item-of-all-unordered-lists 
+: 
+: === flags ===
+: 
+:   -resource RESOURCE         . the resource to fetch
+:   [-local-with-root PATH]    . read files from disk instead of requesting via
+:                                HTTP; all resource paths will be relative to the
+:                                provided root
+:   [-help], -?                . print this help text and exit
+
+*** print-first-item-of-second-unordered-list
+
+: print first item of the second unordered list of an HTML page
+: 
+:   wiki_game.exe lambda-soup-utilities print-first-item-of-second-unordered-list 
+: 
+: === flags ===
+: 
+:   -resource RESOURCE         . the resource to fetch
+:   [-local-with-root PATH]    . read files from disk instead of requesting via
+:                                HTTP; all resource paths will be relative to the
+:                                provided root
+:   [-help], -?                . print this help text and exit
+
+*** print-list-items
+
+: print all list items from an HTML page
+: 
+:   wiki_game.exe lambda-soup-utilities print-list-items 
+: 
+: === flags ===
+: 
+:   -resource RESOURCE         . the resource to fetch
+:   [-local-with-root PATH]    . read files from disk instead of requesting via
+:                                HTTP; all resource paths will be relative to the
+:                                provided root
+:   [-help], -?                . print this help text and exit
+
+*** print-title
+
+: print the title from an HTML page
+: 
+:   wiki_game.exe lambda-soup-utilities print-title 
+: 
+: === flags ===
+: 
+:   -resource RESOURCE         . the resource to fetch
+:   [-local-with-root PATH]    . read files from disk instead of requesting via
+:                                HTTP; all resource paths will be relative to the
+:                                provided root
+:   [-help], -?                . print this help text and exit
+
+** maze
+
+: maze commands
+: 
+:   wiki_game.exe maze SUBCOMMAND
+: 
+: === subcommands ===
+: 
+:   solve                      . parse a file containing a maze and find a
+:                                solution
+:   help                       . explain a given subcommand (perhaps recursively)
+
+*** solve
+
+: parse a file containing a maze and find a solution
+: 
+:   wiki_game.exe maze solve 
+: 
+: === flags ===
+: 
+:   -input FILE                . a file containing a maze
+:   [-help], -?                . print this help text and exit
+
+** social-network
+
+: social network demo
+: 
+:   wiki_game.exe social-network SUBCOMMAND
+: 
+: === subcommands ===
+: 
+:   find-friend-group          . given a person, find their entire friend group
+:   load                       . parse a file listing friendships and serialize
+:                                graph as a sexp
+:   visualize                  . parse a file listing friendships and generate a
+:                                graph visualizing the social network
+:   help                       . explain a given subcommand (perhaps recursively)
+
+*** find-friend-group
+
+: given a person, find their entire friend group
+: 
+:   wiki_game.exe social-network find-friend-group 
+: 
+: === flags ===
+: 
+:   -input FILE                . a file listing all friendships
+:   -person STRING             . name of person whose friend group to find
+:   [-help], -?                . print this help text and exit
+
+*** load
+
+: parse a file listing friendships and serialize graph as a sexp
+: 
+:   wiki_game.exe social-network load 
+: 
+: === flags ===
+: 
+:   -input FILE                . a file listing all friendships
+:   [-help], -?                . print this help text and exit
+
+*** visualize
+
+: parse a file listing friendships and generate a graph visualizing the social network
+: 
+:   wiki_game.exe social-network visualize 
+: 
+: === flags ===
+: 
+:   -input FILE                . a file listing all friendships
+:   -output FILE               . where to write generated graph
+:   [-help], -?                . print this help text and exit
+
+** wiki-game
+
+: wikipedia game commands
+: 
+:   wiki_game.exe wiki-game SUBCOMMAND
+: 
+: === subcommands ===
+: 
+:   find-path                  . Play wiki game by finding a link between the
+:                                origin and destination pages
+:   print-links                . Print all of the valid wiki page links on a page
+:   visualize                  . parse a file listing interstates and generate a
+:                                graph visualizing the highway network
+:   help                       . explain a given subcommand (perhaps recursively)
+
+*** find-path
+
+: Play wiki game by finding a link between the origin and destination pages
+: 
+:   wiki_game.exe wiki-game find-path 
+: 
+: === flags ===
+: 
+:   -destination _             . the destination page
+:   -origin _                  . the starting page
+:   [-local-with-root PATH]    . read files from disk instead of requesting via
+:                                HTTP; all resource paths will be relative to the
+:                                provided root
+:   [-max-depth INT]           . maximum length of path to search for (default 10)
+:   [-help], -?                . print this help text and exit
+
+*** print-links
+
+: Print all of the valid wiki page links on a page
+: 
+:   wiki_game.exe wiki-game print-links 
+: 
+: === flags ===
+: 
+:   -resource RESOURCE         . the resource to fetch
+:   [-local-with-root PATH]    . read files from disk instead of requesting via
+:                                HTTP; all resource paths will be relative to the
+:                                provided root
+:   [-help], -?                . print this help text and exit
+
+*** visualize
+
+: parse a file listing interstates and generate a graph visualizing the highway network
+: 
+:   wiki_game.exe wiki-game visualize 
+: 
+: === flags ===
+: 
+:   -origin _                  . the starting page
+:   -output FILE               . where to write generated graph
+:   [-local-with-root PATH]    . read files from disk instead of requesting via
+:                                HTTP; all resource paths will be relative to the
+:                                provided root
+:   [-max-depth INT]           . maximum length of path to search for (default 10)
+:   [-help], -?                . print this help text and exit

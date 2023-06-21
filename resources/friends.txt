@@ -1,0 +1,13 @@
+alpha,bravo
+bravo,charlie
+delta,alpha
+echo,foxtrot
+bravo,foxtrot
+delta,golf
+hotel,india
+golf,hotel
+golf,india
+juliet,romeo
+delta,india
+kilo,foxtrot
+foxtrot,lima

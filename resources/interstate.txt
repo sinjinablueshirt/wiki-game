@@ -1,0 +1,16 @@
+I-5,Seattle,Portland,Sacramento,Los Angeles,San Diego
+I-10,Los Angeles,Phoenix,Tucson,El Paso,San Antonio,Houston,New Orleans,Tallahassee,Jacksonville
+I-15,Sweetgrass,Great Falls,Butte,Idaho Falls,Ogden,Salt Lake City,Provo,Las Vegas
+I-20,Midland,Odessa,Shreveport,Monroe,Jackson,Birmingham,Atlanta,Augusta,Florence
+I-25,Buffalo,Casper,Cheyenne,Fort Collins,Denver,Colorado Springs,Pueblo,Santa Fe,Albuquerque,Las Cruces
+I-35,Duluth,Minneapolis,Kansas City,Wichita,Oklahoma City,Fort Worth,Dallas,Austin,San Antonio
+I-40,Barstow,Needles,Kingman,Flagstaff,Albuquerque,Amarillo,Oklahoma City,Little Rock,Memphis,Nashville,Asheville,Raleigh
+I-45,Dallas,Corsicana,Huntsville,Conroe,Houston,Galveston
+I-55,Chicago,Springfield,St. Louis,Cape Girardeau,Memphis,Grenada,Jackson,Hammond,New Orleans
+I-64,St. Louis,Louisville,Lexington,Charleston,Richmond,Suffolk,Norfolk,Chesapeake
+I-65,Gary,Chicago,Indianapolis,Louisville,Nashville,Birmingham,Mobile
+I-70,Grand Junction,Denver,Kansas City,St. Louis,Terre Haute,Indianapolis,Columbus,Wheeling,Baltimore
+I-75,Detroit,Toledo,Cincinnati,Lexington,Knoxville,Chattanooga,Atlanta,Macon,Gainesville,Tampa,Naples
+I-80,San Francisco,Sacramento,Reno,Salt Lake City,Cheyenne,Omaha,Des Moines,Quad Cities,Chicago,Toledo,Cleveland
+I-90,Spokane,Seattle,Billings,Rapid City,Sioux Falls,Minneapolis,Madison,Chicago,Toledo,Cleveland,Buffalo,Boston
+I-95,Boston,Providence,New York City,Philadelphia,Baltimore,Washington D.C.,Richmond,Florence,Savannah,Jacksonville,Miami

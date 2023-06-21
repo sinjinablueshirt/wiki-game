@@ -18,9 +18,15 @@ green "Create fork" button at the bottom.
 Then clone the fork locally (on your AWS machine) to get started. You can clone a repo on
 the command line like this (where `$USER` is your GitHub username):
 
-<!-- CR hxu -->
 ```
 $ git clone git@github.com:$USER/wiki-game.git
+Cloning into 'wiki-game'...
+remote: Enumerating objects: 61, done.
+remote: Counting objects: 100% (61/61), done.
+remote: Compressing objects: 100% (57/57), done.
+remote: Total 61 (delta 2), reused 61 (delta 2), pack-reused 0
+Receiving objects: 100% (61/61), 235.81 KiB | 6.74 MiB/s, done.
+Resolving deltas: 100% (2/2), done.
 ```
 
 Now you should be able to enter the project directory, build the starter code, and run the
@@ -36,33 +42,20 @@ $ dune exec ./bin/wiki_game.exe -- help
 ## Directory layout
 
 The files for these exercises are contained in the following directories:
-- `src` directory
-  - `file_fetcher.ml(i)` and `file_fetcher_demo.ml(i)`: a small OCaml library for reading files
-  (either remotely or locally), and a demo of its usage
-  - `wikipedia_namespace.ml(i)`: a small OCaml library for handling Wikipedia namespaces,
-    which you will encounter later in this exercise
-  - `lambda_soup_demo.ml(i)`: a demo for using the [Lambda
-    Soup](https://github.com/aantron/lambdasoup) OCaml library to parse HTML
-  - `imdb.ml`, `interstate.ml`, `lambda_soup_practice.ml`, `maze.ml`,
-    `social_network.ml`, and `wiki_game.ml`: these are the files you will modify to
-    complete the exercises
-  - `wiki_game_lib.ml(i)`: a module that wraps up all of the commands implemented here
-- `bin` directory
-  - `wiki_game.ml(i)`: a wrapper for calling the commands from `Wiki_game_lib`
-- `resources` directory
-  - `friends.txt`: a file describing pairwise friendships, for use with the exercises from
-    the [`Social_media`](./src/social_media.mli) module
-  - `interstate.txt`: a file that lists US interstate highways and major cities that they
-    run through, for use with exercises from the [`Interstate`](./src/interstate.mli)
-    module
-  - `maze_{small,medium,large}.txt`: files that contain sample mazes, for use with
-    exercises from the [`Maze`](./src/maze.mli) module
-  - `wiki`: a directory that contains a small dataset of Wikipedia-like articles, for use
-    with exercises from the [`Wiki_game`](./src/wiki_game.mli) module
-- `test` directory
-  - Starter code for unit tests you may wish to write
-- `images` directory
-  - Contains some images that are referenced in this README
+| directory | file(s)                                                                        | description                                                                                                                                                              |
+|-----------|--------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `src`     | `file_fetcher.ml(i)` and `file_fetcher_demo.ml(i)`                             | a small OCaml library for reading files (either remotely or locally), and a demo of its usage                                                                            |
+| ^         | `wikipedia_namespace.ml(i)`                                                    | a small OCaml library for handling Wikipedia namespaces, which you will encounter later in this exercise                                                                 |
+| ^         | `lambda_soup_utilities.ml(i)`                                                  | a demo for using the [Lambda Soup](https://github.com/aantron/lambdasoup) OCaml library to parse HTML; you'll also add some functionality in this library in an exercise |
+| ^         | `imdb.ml`, `interstate.ml`, `maze.ml`, `social_network.ml`, and `wiki_game.ml` | these are the other files you will modify to complete the exercises                                                                                                      |
+| ^         | `wiki_game_lib.ml(i)`                                                          | a module that wraps up all of the commands implemented here                                                                                                              |
+| `bin`     | `wiki_game.ml(i)`                                                              | a wrapper for calling the commands from `Wiki_game_lib`                                                                                                                  |
+| `resources` | `friends.txt`                                                                  | a file describing pairwise friendships, for use with the exercises from the [`Social_media`](./src/social_media.mli) module                                              |
+| ^         | `interstate.txt`                                                               | a file that lists US interstate highways and major cities that they run through, for use with exercises from the [`Interstate`](./src/interstate.mli) module             |
+| ^         | `maze_{small,medium,large}.txt`                                                | files that contain sample mazes, for use with exercises from the [`Maze`](./src/maze.mli) module                                                                         |
+| ^         | `wiki`                                                                         | a directory that contains a small dataset of Wikipedia-like articles, for use with exercises from the [`Wiki_game`](./src/wiki_game.mli) module                          |
+| `test`      | `wiki_game_test.ml(i)                                                          | starter code for unit tests you may wish to write |
+| `images`    | | contains some images that are referenced in this README |
 
 # HTML
 
@@ -73,7 +66,7 @@ free to grab a TA if you have any questions.
 <!-- CR hxu for kabrokwa: TODO (exercises to familiarize with HTML format, maybe inspect
  !-- things in chrome, write some HTML documents, etc.) -->
 
-## Lets write some HTML
+## Let's write some HTML
 
 - Open [example website](./resources/example_website.png) screenshot.
 - Try to recreate this webpage
@@ -105,9 +98,7 @@ Here is the URL to a cat picture. Feel free to use your own.
 https://i.natgeofe.com/n/548467d8-c5f1-4551-9f58-6817a8d2c45e/NationalGeographic_2572187_square.jpg
 ```
 
-
-
-# Web scraping {#web-scraping}
+# Web scraping
 
 In this section, we'll put our knowledge of HTML to use by building some tools to read and
 parse webpages.
@@ -154,7 +145,24 @@ exercises.
 
 The library we will use for parsing HTML in code is called [Lambda
 Soup](https://github.com/aantron/lambdasoup). Take a quick look at this
-[demo](./src/lambda_soup_demo.ml) to see some examples of the library in action.
+[lambda_soup_utilities.ml](./src/lambda_soup_utilities.ml) to see some examples of the
+library in action. You can run the implemented utilities like so:
+```
+$ dune exec ./bin/wiki_game.exe -- lambda-soup-utilities print-title -resource https://en.wikipedia.org/wiki/Cat
+Cat - Wikipedia
+```
+
+```
+$ dune exec ./bin/wiki_game.exe -- lambda print-list-items -local-with-root resources -resource /wiki/Carnivore
+All feliforms, such as domestic cats, big cats, hyenas, mongooses, civets
+Almost all caniforms, such as the dogs, wolves, foxes, ferrets, seals and walruses
+All cetaceans, such as dolphins, whales and porpoises
+All bats except fruitbats
+The carnivorous marsupials, such as the Tasmania devil
+All birds of prey, such as hawks, eagles, falcons and owls
+All vultures, both old world and new
+Most waterfowl, such as gulls, penguins, pelicans, storks, and herons
+```
 
 ## Exercises
 
@@ -167,7 +175,7 @@ them.
 
 To get our feet wet with these libraries, let's write a few utility functions for
 extracting certain elements from HTML webpages. In
-[lambda_soup_practice.ml](./src/lambda_soup_practice.ml):
+[lambda_soup_utilities.ml](./src/lambda_soup_utilities.ml):
 
 1. Implement `print-first-item-of-all-unordered-lists`
 2. Implement `print-first-item-of-second-unordered-list`
@@ -196,7 +204,7 @@ piscivores
 You should also try testing your implementations on a page of your choosing on the
 internet!
 
-### Exercise 2: scraping wikipedia
+### Exercise 2: scraping Wikipedia
 
 Now, let's put our skills to use by implementing a function that extracts all of the links
 in a Wikipedia article that link to another Wikipedia article. Implement `get_linked_articles` function
@@ -264,7 +272,7 @@ This section and exercises are intended to be completed after the Introduction t
 talk, but you are welcome to browse ahead. Feel free to grab a TA if you have any
 questions.
 
-## Visualizing graphs in OCaml {#visualizing-graphs}
+## Visualizing graphs in OCaml
 
 When working with graphs, it's often useful to be able to see what the graph looks like,
 rendered as nodes and edges in a human-consumable way. The
@@ -293,7 +301,7 @@ Open up `~/friends.pdf` to see the graph. You should see something like:
 You can also take a look at the input [friends.txt](./resources/friends.txt) file to see
 if the outputted graph matches your expectations.
 
-## Exercise: interstate map {#interstate-mapping}
+## Exercise: interstate map
 
 Let's practice building a representation of a graph in OCaml and visualizing it using
 ocamlgraph's DOT API.
@@ -353,12 +361,18 @@ sequence of mutual friends, and every friend of a person who is a part of the gr
 also a part of a group.
 
 For a concrete example, take a look at the `friends.pdf` graph from
-[above](#visualizing-graphs). Notice how in this graph, "romeo" and "juliet" are connected
-to each other, but are completely separated from the other friends. If we query our graph
-for the whole friend group containing "romeo", we should output "romeo" and "juliet". If
-we query our graph for the whole friend group containing "alpha", we should output
-"alpha", "bravo", "charlie", "delta", "echo", "foxtrot", "golf", "hotel", "india", "kilo",
-and "lima".
+[above](#visualizing-graphs-in-ocaml). Notice how in this graph, "romeo" and "juliet" (red
+square) are connected to each other, but are completely separated from the other friends
+(blue square):
+
+<center>
+<img src="./images/friend_groups.png" width="500">
+</center>
+
+If we query our graph for the whole friend group containing "romeo", we should output
+"romeo" and "juliet". If we query our graph for the whole friend group containing "alpha",
+we should output "alpha", "bravo", "charlie", "delta", "echo", "foxtrot", "golf", "hotel",
+"india", "kilo", and "lima". 
 
 Let's implement the `find-friend-group` command in
 [social_network.ml](./src/social_network.ml).
@@ -391,7 +405,7 @@ Let's go back to our Wikipedia game player. Earlier, we implemented logic
 to parse out links between Wikipedia articles. Now, let's build a graph showing how
 articles are connected to each other.
 
-Similar to the [interstate mapping exercise](#interstate-mapping), we'll want to generate
+Similar to the [interstate mapping exercise](#exercise-interstate-map), we'll want to generate
 a dot file showing how the different wikipedia pages are linked. Unlike the interstate
 mapping exercise, we won't know up front what the edges in our graph are, so we'll need to
 explore our graph to enumerate the edges.
@@ -415,7 +429,7 @@ The generated PDF file containing the visualization of the graph should look som
 like this:
 
 <center>
-<img src="./images/wiki.png" width="500">
+<img src="./images/wiki.png" width="700">
 </center>
 
 
@@ -491,7 +505,8 @@ questions.
 ### Exercise ?: optimized wiki racer
 
 Now that we have some more tools in our graph search toolbelt, let's try to improve our
-implementation of the Wikipedia game player from above.
+implementation of the Wikipedia game player from above. What are some heuristics that we
+can try to employ to make our search algorithm faster?
 
 # Extensions
 

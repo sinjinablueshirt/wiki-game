@@ -512,8 +512,15 @@ Guido J. Martinelli Endara - Wikipedia
 Consejo Nacional de Relaciones Exteriores - Wikipedia
 ```
 
+```
+$ dune exec ./bin/wiki_game.exe -- wiki-game find-path -origin https://en.wikipedia.org/wiki/Acoustic_Kitty -destination https://en.wikipedia.org/wiki/Age_of_Discovery
+Acoustic Kitty - Wikipedia
+Cat - Wikipedia
+Age of Discovery - Wikipedia
+```
+
 You may notice that your implementation can be very slow to find paths on certain inputs
-(including the second example above). That's normal! Do you see why? Grab a TA or another
+(including the second and third examples above). That's normal! Do you see why? Grab a TA or another
 fellow to discuss!
 
 In the next section, we'll learn about some ways that we can make graph search faster.

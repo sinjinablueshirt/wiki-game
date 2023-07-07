@@ -1,4 +1,5 @@
 (library 
   (name wiki_game_lib)
   (libraries core curl file_path ocamlgraph lambdasoup uri)
-  (preprocess (pps ppx_jane)))
+  (preprocess (pps ppx_jane))
+  (inline_tests))

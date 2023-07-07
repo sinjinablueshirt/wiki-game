@@ -45,15 +45,16 @@ The files for these exercises are contained in the following directories:
 | directory | file(s)                                                                        | description                                                                                                                                                              |
 |-----------|--------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `src`     | `file_fetcher.ml(i)` and `file_fetcher_demo.ml(i)`                             | a small OCaml library for reading files (either remotely or locally), and a demo of its usage                                                                            |
-|^         | `wikipedia_namespace.ml(i)`                                                    | a small OCaml library for handling Wikipedia namespaces, which you will encounter later in this exercise                                                                 |
-|^         | `lambda_soup_utilities.ml(i)`                                                  | a demo for using the [Lambda Soup](https://github.com/aantron/lambdasoup) OCaml library to parse HTML; you'll also add some functionality in this library in an exercise |
-|^         | `imdb.ml`, `interstate.ml`, `maze.ml`, `social_network.ml`, and `wiki_game.ml` | these are the other files you will modify to complete the exercises                                                                                                      |
-|^         | `wiki_game_lib.ml(i)`                                                          | a module that wraps up all of the commands implemented here                                                                                                              |
+|         | `wikipedia_namespace.ml(i)`                                                    | a small OCaml library for handling Wikipedia namespaces, which you will encounter later in this exercise                                                                 |
+|         | `lambda_soup_utilities.ml(i)`                                                  | a demo for using the [Lambda Soup](https://github.com/aantron/lambdasoup) OCaml library to parse HTML; you'll also add some functionality in this library in an exercise |
+|         | `imdb.ml`, `interstate.ml`, `maze.ml`, `social_network.ml`, and `wiki_game.ml` | these are the other files you will modify to complete the exercises                                                                                                      |
+|         | `wiki_game_lib.ml(i)`                                                          | a module that wraps up all of the commands implemented here                                                                                                              |
 | `bin`     | `wiki_game.ml(i)`                                                              | a wrapper for calling the commands from `Wiki_game_lib`                                                                                                                  |
-| `resources` | `friends.txt`                                                                  | a file describing pairwise friendships, for use with the exercises from the [`Social_media`](./src/social_media.mli) module                                              |
-|^         | `interstate.txt`                                                               | a file that lists US interstate highways and major cities that they run through, for use with exercises from the [`Interstate`](./src/interstate.mli) module             |
-|^         | `maze_{small,medium,large}.txt`                                                | files that contain sample mazes, for use with exercises from the [`Maze`](./src/maze.mli) module                                                                         |
-|^         | `wiki`                                                                         | a directory that contains a small dataset of Wikipedia-like articles, for use with exercises from the [`Wiki_game`](./src/wiki_game.mli) module                          |
+| `resources` | `friends.txt`                                                                  | a file describing pairwise friendships, for use with the exercises from the [`Social_network`](./src/social_network.mli) module                                              |
+|         | `interstate.txt`                                                               | a file that lists US interstate highways and major cities that they run through, for use with exercises from the [`Interstate`](./src/interstate.mli) module             |
+|         | `maze_{small,medium,large}.txt`                                                | files that contain sample mazes, for use with exercises from the [`Maze`](./src/maze.mli) module                                                                         |
+|         | `wiki`                                                                         | a directory that contains a small dataset of Wikipedia-like articles, for use with exercises from the [`Wiki_game`](./src/wiki_game.mli) module                          |
+| `web-dev    | `index.html`, `index.js`, `style.css`                                      | start code for your personal blog |
 | `test`      | `wiki_game_test.ml(i)`                                                          | starter code for unit tests you may wish to write |
 | `images`    | | contains some images that are referenced in this README |
 
@@ -63,40 +64,64 @@ The exercises for the [HTML](#html) and [Web scraping](#web-scraping) sections a
 intended to be completed after the HTML talk, but you are welcome to browse ahead. Feel
 free to grab a TA if you have any questions.
 
-<!-- CR hxu for kabrokwa: TODO (exercises to familiarize with HTML format, maybe inspect
- !-- things in chrome, write some HTML documents, etc.) -->
+## Exercise 1: Creating a webpage
 
-## Let's write some HTML
+To familiarize ourselves with HTML documents, let's create a webpage of our own.
 
-- Open [example website](./resources/example_website.png) screenshot.
-- Try to recreate this webpage
+In `web-dev/index.html`, you'll find some boilerplate to get you started.
 
-Here is some boilerplate to get you started:
+Between the `<body></body>` tags, add anything you want to appear on your webpage. For
+some guidelines, try to include the following elements in your page:
 
-<!-- CR kabrokwa for kabrokwa: edit the actual paths to the js and css -->
+- A large header, using the `h1` element
+- Some subsection, using the `h2` elements or other such subheading elements
+- An unordered list `ul`
+- An ordered ist `ol`
+- A `table` with a `th` header row
+- At least 1 `img` of your choosing
+- A link `a` to another page that you create from scratch
+
+You can check out [w3schools](https://www.w3schools.com/tags/default.asp) for a reference
+on HTML elements. There are also plenty of other resources on the internet, and feel free
+to ask a TA if you need any help.
+
+You may add any other content to your webpages that you'd like. Don't hesitate to get
+creative!
+
+Note that the directory and HTML template includes a stylesheet named `style.css` and
+JavaScript file named `index.js`. If you would like to add some styling to your document,
+modify those files to your liking.
+
+Once you have written your html, css, and javascript, `cd` into the web-dev directory and
+start a HTTP server with:
+
 ```
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>My Blog</title>
-        <link rel="stylesheet" href="style.css">
-    </head>
-    <body>
-    </body>
-	  <script src="index.js"></script>
-</html>
+$ python -m SimpleHTTPServer 8080
 ```
 
-Note that this includes a stylesheet and javascript. This add some basic styling and
-functionality to help you with your page.
+Find your hostname:
 
-Here is the URL to a cat picture. Feel free to use your own.
 ```
-https://i.natgeofe.com/n/548467d8-c5f1-4551-9f58-6817a8d2c45e/NationalGeographic_2572187_square.jpg
+$ curl http://169.254.169.254/latest/meta-data/public-hostname
 ```
+
+Navigate your browser to:
+
+```
+<YOUR-HOST-NAME>:8080
+```
+
+And you will see your webpage!
+
+## Exercise 2: Inspecting your webpage
+
+Google Chrome provides builtin tools for inspecting the source code of any website you
+visit. To open these tools, right-click any element on the page and click `Inspect`. This
+will open a panel in which you can hover over bits of HTML which will cause Chrome to
+highlight the corresponding sections of the webpage.
+
+Now that you've written some HTML, try using the Chrome inspector tool to look at your
+webpage.
 
 # Web scraping
 
@@ -141,10 +166,13 @@ $ dune exec ./bin/wiki_game.exe -- file-fetcher-demo -local-with-root resources 
 We will use this tiny `File_fetcher` library to grab webpages in our web-scraping
 exercises.
 
+Before continuing, please take a look at the `File_fetcher` library and try out the
+commands above.
+
 ## Parsing HTML
 
 The library we will use for parsing HTML in code is called [Lambda
-Soup](https://github.com/aantron/lambdasoup). Take a quick look at this
+Soup](https://github.com/aantron/lambdasoup). Take a quick look at
 [lambda_soup_utilities.ml](./src/lambda_soup_utilities.ml) to see some examples of the
 library in action. You can run the implemented utilities like so:
 ```
@@ -280,7 +308,7 @@ rendered as nodes and edges in a human-consumable way. The
 by giving us utilities for constructing a graph and outputting it as a
 [DOT](https://en.wikipedia.org/wiki/DOT_(graph_description_language)) file.
 
-Take a look at [social_network_demo.ml](./src/social_network_demo.ml) for an example of
+Take a look at [social_network.ml](./src/social_network.ml) for an example of
 how we can use OCamlgraph to generate visualizations of graphs. From the root of the repo,
 you can run this example like so:
 ```
@@ -292,7 +320,7 @@ Then, you can render the outputted DOT file as a PDF:
 cat /tmp/friends.dot | dot -Tpdf -o ~/friends.pdf
 ```
 
-Open up `~/friends.pdf` to see the graph. You should see something like:
+Open up `~/friends.pdf` in VSCode to see the graph. You should see something like:
 
 <center>
 <img src="./images/friends.png" width="500">
@@ -327,7 +355,7 @@ a list of some of the major cities that the interstate runs through.
 We'll be writing our code as the `load` and `visualize` commands in
 [interstate.ml](./src/interstate.ml). First, we'll need to read in the input file. If you
 haven't yet, see how we read and parsed comma-separated files in
-[social_network_demo.ml](./src/social_network_demo.ml). Once we can parse the input file,
+[social_network.ml](./src/social_network.ml). Once we can parse the input file,
 we can then construct our graph.
 
 You should take a bit of time to explore the ocamlgraph API. See if you can render your
@@ -372,7 +400,7 @@ square) are connected to each other, but are completely separated from the other
 If we query our graph for the whole friend group containing "romeo", we should output
 "romeo" and "juliet". If we query our graph for the whole friend group containing "alpha",
 we should output "alpha", "bravo", "charlie", "delta", "echo", "foxtrot", "golf", "hotel",
-"india", "kilo", and "lima". 
+"india", "kilo", and "lima".
 
 Let's implement the `find-friend-group` command in
 [social_network.ml](./src/social_network.ml).
@@ -498,15 +526,29 @@ questions.
 
 ## Exercises
 
-<!-- CR hxu for kabrokwa: TODO -->
+### Exercise 1: Dijkstra's Algorithm
 
-### Exercise 1:
+In [`dijkstra.ml`](./src/dijkstra.ml) you will find some data structures and function
+stubs that will help you implement Dijkstra's algorithm for finding the shortest path
+between two nodes in a weighted graph (as discussed in your advanced graph search talk).
 
-### Exercise ?: optimized wiki racer
+There are a handful of exercises that require you to implement some helper functions
+before finally implementing Dijkstra's algorithm in the `shortest_path` function. Head to
+[`dijkstra.ml`](./src/dijkstra.ml) for instructions. 
+
+For a refresher on the algorithm, you may use the [wikipedia
+page](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm#Algorithm) or other high level
+descriptions you may find. Be wary not to overfit your solution to any pseudocode or
+reference impementation you may come by as this OCaml implementation is probably quite
+different.
+
+### Exercise 2: Optimized wiki racer
 
 Now that we have some more tools in our graph search toolbelt, let's try to improve our
 implementation of the Wikipedia game player from above. What are some heuristics that we
 can try to employ to make our search algorithm faster?
+
+Feel free to discuss your ideas with each other and the TAs.
 
 # Extensions
 

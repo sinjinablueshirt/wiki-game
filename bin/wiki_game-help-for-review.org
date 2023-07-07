@@ -13,7 +13,7 @@
 :   interstate                 . interstate highway commands
 :   lambda-soup-utilities      . lambda soup demo
 :   maze                       . maze commands
-:   social-network             . social network demo
+:   social-network             . social network commands
 :   wiki-game                  . wikipedia game commands
 :   version                    . print version information
 :   help                       . explain a given subcommand (perhaps recursively)
@@ -223,7 +223,7 @@
 
 ** social-network
 
-: social network demo
+: social network commands
 : 
 :   wiki_game.exe social-network SUBCOMMAND
 : 

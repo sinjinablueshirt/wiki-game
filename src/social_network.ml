@@ -148,7 +148,7 @@ let find_friend_group_command =
 
 let command =
   Command.group
-    ~summary:"social network demo"
+    ~summary:"social network commands"
     [ "load", load_command
     ; "visualize", visualize_command
     ; "find-friend-group", find_friend_group_command

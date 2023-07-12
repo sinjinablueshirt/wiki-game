@@ -320,7 +320,9 @@ Then, you can render the outputted DOT file as a PDF:
 cat /tmp/friends.dot | dot -Tpdf -o ~/friends.pdf
 ```
 
-Open up `~/friends.pdf` in VSCode to see the graph. You should see something like:
+Open up `~/friends.pdf` in VSCode to see the graph. (You may need to install the 
+[vscode-pdf](https://marketplace.visualstudio.com/items?itemName=tomoki1207.pdf) extension 
+to open PDFs directly in VSCode.) You should see something like:
 
 <center>
 <img src="./images/friends.png" width="500">
@@ -348,9 +350,9 @@ Columbia and some territories.
 
 In this exercise, we will visualize some of the Interstate Highway System as a graph,
 where the nodes are cities, and two cities have an edge between them if they are connected
-by the same interstate highway. The input file
-[interstate.txt](./resources/interstate.txt) has a list of interstate highways along with
-a list of some of the major cities that the interstate runs through.
+by the same interstate highway (they do not need to be consecutive cities on the highway). 
+The input file [interstate.txt](./resources/interstate.txt) has a list of interstate highways 
+along with a list of some of the major cities that the interstate runs through.
 
 We'll be writing our code as the `load` and `visualize` commands in
 [interstate.ml](./src/interstate.ml). First, we'll need to read in the input file. If you

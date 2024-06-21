@@ -7,8 +7,6 @@ In this project, you will use knowledge about HTML, graphs, and graph search to 
 
 # Getting started
 
-## Background
-
 ## Prep work
 
 First, fork this repository by visiting [this
@@ -54,7 +52,7 @@ The files for these exercises are contained in the following directories:
 |         | `interstate.txt`                                                               | a file that lists US interstate highways and major cities that they run through, for use with exercises from the [`Interstate`](./src/interstate.mli) module             |
 |         | `maze_{small,medium,large}.txt`                                                | files that contain sample mazes, for use with exercises from the [`Maze`](./src/maze.mli) module                                                                         |
 |         | `wiki`                                                                         | a directory that contains a small dataset of Wikipedia-like articles, for use with exercises from the [`Wiki_game`](./src/wiki_game.mli) module                          |
-| `web-dev`    | `index.html`, `index.js`, `style.css`                                      | start code for your personal blog |
+| `web-dev    | `index.html`, `index.js`, `style.css`                                      | starter code for your personal blog |
 | `test`      | `wiki_game_test.ml(i)`                                                          | starter code for unit tests you may wish to write |
 | `images`    | | contains some images that are referenced in this README |
 
@@ -122,6 +120,15 @@ highlight the corresponding sections of the webpage.
 
 Now that you've written some HTML, try using the Chrome inspector tool to look at your
 webpage.
+
+# The `Command` module
+
+In the rest of this project, we will be encountering a number of commandline
+tools. In OCaml, we use the `Command` library to write apps that take commandline
+arguments. 
+
+Let's take a brief detour here to learn about the `Command` library. Take a look at the
+command-demo directory on your box for a sample usage and explanations. 
 
 # Web scraping
 
@@ -205,12 +212,19 @@ To get our feet wet with these libraries, let's write a few utility functions fo
 extracting certain elements from HTML webpages. In
 [lambda_soup_utilities.ml](./src/lambda_soup_utilities.ml):
 
-1. Implement `print-first-item-of-all-unordered-lists`
-2. Implement `print-first-item-of-second-unordered-list`
-3. Implement `print-bolded-text`
+1. Implement `print-first-item-of-all-unordered-lists` by completing the
+   `get_first_item_of_all_unordered_lists` function.
+2. Implement `print-first-item-of-second-unordered-list` by completing the
+   `get_first_item_of_second_unordered_list` function.
+3. Implement `print-bolded-text` by completing the `get_bolded_text` function.
 
-For each of these exercises, you can test your implementation locally on
-[resources/wiki/Carnivore](./resources/wiki/Carnivore):
+For each of these exercises, try writing an expect test to verify its behavior in
+[test/wiki_game_test.ml](./test/wiki_game_test.ml). Note that you will also need to expose
+these functions in [src/lambda_soup_utilities.mli](./src/lambda_soup_utilities.mli) in
+order to access them for your tests. An example expect test for the `get_title`
+function is already implemented.
+
+You can also test your implementation locally on [resources/wiki/Carnivore](./resources/wiki/Carnivore):
 ```
 $ dune exec ./bin/wiki_game.exe -- lambda-soup-utilities print-first-item-of-all-unordered-lists -local-with-root resources -resource /wiki/Carnivore
 All feliforms, such as domestic cats, big cats, hyenas, mongooses, civets
@@ -229,7 +243,7 @@ insectivores
 piscivores
 ```
 
-You should also try testing your implementations on a page of your choosing on the
+Finally, you should try testing your implementations on a page of your choosing on the
 internet!
 
 ### Exercise 2: scraping Wikipedia
@@ -248,7 +262,11 @@ Note that there is a bit of nuance in this exercise:
   handling Wikipedia namespaces. Take a look over
   [wikipedia_namespace.mli](./src/wikipedia_namespace.mli) to learn more.
 
-You can test your implementation locally using any of the pages in the [Wikipedia test
+As with before, let's try writing an expect test for your `get_linked_articles` function
+in [test/wiki_game_test.ml](./test/wiki_game_test.ml). (Remember that you may need to
+add your function to [wiki_game.mli](./src/wiki_game.mli) to use it in your test.)
+
+You can also test your implementation locally using any of the pages in the [Wikipedia test
 dataset](./resources/wiki). For example:
 ```
 $ dune exec ./bin/wiki_game.exe -- wiki-game print-links -local-with-root resources -resource /wiki/Cat
@@ -258,7 +276,7 @@ $ dune exec ./bin/wiki_game.exe -- wiki-game print-links -local-with-root resour
 /wiki/Species
 ```
 
-You should also test your implementation on some real Wikipedia pages, such as:
+Finally, you should test your implementation on some real Wikipedia pages, such as:
 ```
 $ dune exec ./bin/wiki_game.exe -- wiki-game print-links -resource https://en.wikipedia.org/wiki/Endara
 /wiki/Endara
@@ -280,8 +298,13 @@ For this exercise, you'll likely need to dig into filtering out nodes based on s
 node attributes or classes. It may be useful to inspect the HTML page in chrome to figure
 out how to identify the relevant nodes for this task.
 
-Implement the `print-credits` command in [imdb.ml](./src/imdb.ml). You can test your
-implementation by running it on an IMDB page of your choosing, like so:
+Implement the `print-credits` command in [imdb.ml](./src/imdb.ml) by implementing the
+`get_credits` function. 
+
+Once again, test your work by adding an expect test for `get_credits` in
+[test/wiki_game_test.ml](./test/wiki_game_test.ml).
+
+You should also test your implementation by running it on an IMDB page of your choosing, like so:
 
 ```
 $ dune exec ./bin/wiki_game.exe -- imdb print-credits -resource https://www.imdb.com/name/nm0000706/?ref_=fn_al_nm_1
@@ -320,9 +343,7 @@ Then, you can render the outputted DOT file as a PDF:
 cat /tmp/friends.dot | dot -Tpdf -o ~/friends.pdf
 ```
 
-Open up `~/friends.pdf` in VSCode to see the graph. (You may need to install the 
-[vscode-pdf](https://marketplace.visualstudio.com/items?itemName=tomoki1207.pdf) extension 
-to open PDFs directly in VSCode.) You should see something like:
+Open up `~/friends.pdf` in VSCode to see the graph. You should see something like:
 
 <center>
 <img src="./images/friends.png" width="500">
@@ -350,9 +371,10 @@ Columbia and some territories.
 
 In this exercise, we will visualize some of the Interstate Highway System as a graph,
 where the nodes are cities, and two cities have an edge between them if they are connected
-by the same interstate highway (they do not need to be consecutive cities on the highway). 
-The input file [interstate.txt](./resources/interstate.txt) has a list of interstate highways 
-along with a list of some of the major cities that the interstate runs through.
+by the same interstate highway (they do not need to be consecutive cities on the
+highway). The input file [interstate.txt](./resources/interstate.txt) has a list of
+interstate highways along with a list of some of the major cities that the interstate runs
+through. 
 
 We'll be writing our code as the `load` and `visualize` commands in
 [interstate.ml](./src/interstate.ml). First, we'll need to read in the input file. If you
@@ -429,6 +451,9 @@ charlie
 alpha
 ```
 
+You should also write an expect test for this function in
+[test/wiki_game_test.ml](./test/wiki_game_test.ml).
+
 ### Exercise 2: wiki mapper
 
 Let's go back to our Wikipedia game player. Earlier, we implemented logic
@@ -478,6 +503,12 @@ implementing the solver, you should also think about how you'll want to display 
 solution.
 
 Let's implement the `solve` command in [maze.ml](./src/maze.ml).
+
+Try to implement the command in a way that allows you to write an expect test. You should
+also make sure to test your command in the commandline using the
+[maze_small.txt](./resources/maze_small.txt),
+[maze_medium.txt](./resources/maze_medium.txt), and
+[maze_large.txt](./resources/maze_large.txt) files. 
 
 ### Exercise 4: wiki racer
 

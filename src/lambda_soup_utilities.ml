@@ -6,6 +6,28 @@ let get_title contents : string =
   parse contents $ "title" |> R.leaf_text
 ;;
 
+let%expect_test "get_title" =
+  (* This test specifies the HTML content directly in the file. *)
+  let contents =
+    {|<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>My Blog</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+    </body>
+    <script src="index.js"></script>
+</html>
+|}
+  in
+  print_endline (get_title contents);
+  [%expect {| My Blog |}]
+;;
+
 (* Gets all of the list items contained in an HTML page. *)
 let get_list_items contents : string list =
   let open Soup in
@@ -13,6 +35,27 @@ let get_list_items contents : string list =
   $$ "li"
   |> to_list
   |> List.map ~f:(fun li -> texts li |> String.concat ~sep:"" |> String.strip)
+;;
+
+let%expect_test "get_list_items" =
+  (* This test uses existing files on the filesystem. *)
+  let contents =
+    File_fetcher.fetch_exn
+      (Local (File_path.of_string "../resources/wiki"))
+      ~resource:"Carnivore"
+  in
+  List.iter (get_list_items contents) ~f:print_endline;
+  [%expect
+    {|
+    All feliforms, such as domestic cats, big cats, hyenas, mongooses, civets
+    Almost all caniforms, such as the dogs, wolves, foxes, ferrets, seals and walruses
+    All cetaceans, such as dolphins, whales and porpoises
+    All bats except fruitbats
+    The carnivorous marsupials, such as the Tasmania devil
+    All birds of prey, such as hawks, eagles, falcons and owls
+    All vultures, both old world and new
+    Most waterfowl, such as gulls, penguins, pelicans, storks, and herons
+    |}]
 ;;
 
 (* Gets the first item of all unordered lists contained in an HTML page. *)

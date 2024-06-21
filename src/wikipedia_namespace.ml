@@ -85,7 +85,8 @@ let%expect_test "all namespaces" =
     TimedText_talk
     Module_talk
     Special_talk
-    Media_talk |}]
+    Media_talk
+    |}]
 ;;
 
 (* This is a bit brittle, but it works well enough for Wikipedia. *)

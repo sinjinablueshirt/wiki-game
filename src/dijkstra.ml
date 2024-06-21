@@ -89,7 +89,7 @@ module Node = struct
     [@@deriving sexp]
   end
 
-  type t = { mutable state : State.t } [@@deriving fields, sexp]
+  type t = { mutable state : State.t } [@@deriving fields ~getters, sexp]
 
   let init () = { state = Unseen }
   let set_state t state = t.state <- state
@@ -102,12 +102,7 @@ module Nodes = struct
 
   (* Exercise 2: Given a list of edges, create a [t] that contains all nodes found in the
      edge list. Note that you can construct [Node.t]s with the [Node.init] function. *)
-  let of_edges edges =
-    List.concat_map edges ~f:(fun { Edge.a; b; _ } -> [ a; b ])
-    |> Node_id.Set.of_list
-    |> Set.to_map ~f:(fun _ -> Node.init ())
-  ;;
-
+  let of_edges edges = Node_id.Map.empty
   let find = Map.find_exn
   let state t node_id = find t node_id |> Node.state
 

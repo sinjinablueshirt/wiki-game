@@ -52,7 +52,7 @@ The files for these exercises are contained in the following directories:
 |         | `interstate.txt`                                                               | a file that lists US interstate highways and major cities that they run through, for use with exercises from the [`Interstate`](./src/interstate.mli) module             |
 |         | `maze_{small,medium,large}.txt`                                                | files that contain sample mazes, for use with exercises from the [`Maze`](./src/maze.mli) module                                                                         |
 |         | `wiki`                                                                         | a directory that contains a small dataset of Wikipedia-like articles, for use with exercises from the [`Wiki_game`](./src/wiki_game.mli) module                          |
-| `web-dev    | `index.html`, `index.js`, `style.css`                                      | starter code for your personal blog |
+| `web-dev`    | `index.html`, `index.js`, `style.css`                                      | starter code for your personal blog |
 | `test`      | `wiki_game_test.ml(i)`                                                          | starter code for unit tests you may wish to write |
 | `images`    | | contains some images that are referenced in this README |
 

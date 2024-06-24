@@ -151,8 +151,7 @@ $ dune exec ./bin/wiki_game.exe -- file-fetcher-demo -resource https://en.wikipe
 
 You can also try out the functionality to read files locally via:
 ```
-$ dune exec ./bin/wiki_game.exe -- file-fetcher-demo -local-with-root resources -resource
-/wiki/Cat
+$ dune exec ./bin/wiki_game.exe -- file-fetcher-demo -local-with-root resources -resource /wiki/Cat 
 <!DOCTYPE html>
 <html>
   <head>

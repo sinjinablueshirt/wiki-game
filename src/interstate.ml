@@ -1,4 +1,49 @@
 open! Core
+module Person = String
+
+(* We separate out the [Network] module to represent our social network in
+   OCaml types. *)
+module Network = struct
+  (* We can represent our social network graph as a set of connections, where
+     a connection represents a friendship between two people. *)
+  module Connection = struct
+    module T = struct
+      type t = Person.t * Person.t [@@deriving compare, sexp]
+    end
+
+    (* This funky syntax is necessary to implement sets of [Connection.t]s.
+       This is needed to defined our [Network.t] type later. Using this
+       [Comparable.Make] functor also gives us immutable maps, which might
+       come in handy later. *)
+    include Comparable.Make (T)
+
+    let of_string s =
+      match String.split s ~on:',' with
+      | [ x; y ] -> Some (Person.of_string x, Person.of_string y)
+      | _ -> None
+    ;;
+  end
+
+  type t = Connection.Set.t [@@deriving sexp_of]
+
+  let of_file input_file =
+    let connections =
+      In_channel.read_lines (File_path.to_string input_file)
+      |> List.concat_map ~f:(fun s ->
+        match Connection.of_string s with
+        | Some (a, b) ->
+          (* Friendships are mutual; a connection between a and b means we
+             should also consider the connection between b and a. *)
+          [ a, b; b, a ]
+        | None ->
+          printf
+            "ERROR: Could not parse line as connection; dropping. %s\n"
+            s;
+          [])
+    in
+    Connection.Set.of_list connections
+  ;;
+end
 
 let load_command =
   let open Command.Let_syntax in

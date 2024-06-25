@@ -1,5 +1,5 @@
 open! Core
-module Person = String
+module City = String
 
 (* We separate out the [Network] module to represent our social network in
    OCaml types. *)
@@ -8,7 +8,7 @@ module Network = struct
      a connection represents a friendship between two people. *)
   module Connection = struct
     module T = struct
-      type t = Person.t * Person.t [@@deriving compare, sexp]
+      type t = City.t * City.t [@@deriving compare, sexp]
     end
 
     (* This funky syntax is necessary to implement sets of [Connection.t]s.
@@ -17,29 +17,42 @@ module Network = struct
        come in handy later. *)
     include Comparable.Make (T)
 
-    let of_string s =
-      match String.split s ~on:',' with
-      | [ x; y ] -> Some (Person.of_string x, Person.of_string y)
-      | _ -> None
+    let pair_first city_list =
+      (* pair the first element of the list with all other elem in list.
+         returns a list of tuples *)
+      let first = City.of_string (List.hd_exn city_list) in
+      let rest = List.tl_exn city_list in
+      let tuplize elem = first, City.of_string elem in
+      List.map rest ~f:tuplize
+    ;;
+
+    let rec get_connections city_list =
+      (* gets all the connections aka all possible pairwise combinations of
+         elements *)
+      match List.length city_list with
+      | 0 | 1 -> []
+      | 2 ->
+        [ ( City.of_string (List.hd_exn city_list)
+          , City.of_string (List.hd_exn (List.tl_exn city_list)) )
+        ]
+      | _ -> pair_first city_list @ get_connections (List.tl_exn city_list)
+    ;;
+
+    let parse_line s =
+      let cities = String.split s ~on:',' in
+      get_connections (List.tl_exn cities)
     ;;
   end
 
   type t = Connection.Set.t [@@deriving sexp_of]
 
-  let of_file input_file =
+  let parse_file input_file =
     let connections =
       In_channel.read_lines (File_path.to_string input_file)
-      |> List.concat_map ~f:(fun s ->
-        match Connection.of_string s with
-        | Some (a, b) ->
-          (* Friendships are mutual; a connection between a and b means we
-             should also consider the connection between b and a. *)
-          [ a, b; b, a ]
-        | None ->
-          printf
-            "ERROR: Could not parse line as connection; dropping. %s\n"
-            s;
-          [])
+      |> List.map
+           ~f:Connection.parse_line (* now have a list of lists of tuples*)
+      |> List.map ~f:(List.concat_map ~f:(fun (a, b) -> [ a, b; b, a ]))
+      |> List.concat
     in
     Connection.Set.of_list connections
   ;;
@@ -58,17 +71,31 @@ let load_command =
             "FILE a file listing interstates and the cities they go through"
       in
       fun () ->
-        let network = Social.of_file input_file in
-        let graph = G.create () in
-        Set.iter network ~f:(fun (person1, person2) ->
-          (* [G.add_edge] auomatically adds the endpoints as vertices in the
-             graph if they don't already exist. *)
-          G.add_edge graph person1 person2);
-        Dot.output_graph
-          (Out_channel.create (File_path.to_string output_file))
-          graph;
-        printf !"Done! Wrote dot file to %{File_path}\n%!" output_file]
+        let network = Network.parse_file input_file in
+        printf !"%{sexp: Network.t}\n" network]
 ;;
+
+(* ignore (input_file : File_path.t); failwith "TODO"] *)
+module G = Graph.Imperative.Graph.Concrete (City)
+
+(* We extend our [Graph] structure with the [Dot] API so that we can easily
+   render constructed graphs. Documentation about this API can be found here:
+   https://github.com/backtracking/ocamlgraph/blob/master/src/dot.mli *)
+module Dot = Graph.Graphviz.Dot (struct
+    include G
+
+    (* These functions can be changed to tweak the appearance of the
+       generated graph. Check out the ocamlgraph graphviz API
+       (https://github.com/backtracking/ocamlgraph/blob/master/src/graphviz.mli)
+       for examples of what values can be set here. *)
+    let edge_attributes _ = [ `Dir `None ]
+    let default_edge_attributes _ = []
+    let get_subgraph _ = None
+    let vertex_attributes v = [ `Shape `Box; `Label v; `Fillcolor 1000 ]
+    let vertex_name v = sprintf {|"%s"|} v
+    let default_vertex_attributes _ = []
+    let graph_attributes _ = []
+  end)
 
 let visualize_command =
   let open Command.Let_syntax in
@@ -91,8 +118,13 @@ let visualize_command =
           ~doc:"FILE where to write generated graph"
       in
       fun () ->
-        ignore (input_file : File_path.t);
-        ignore (output_file : File_path.t);
+        let network = Network.parse_file input_file in
+        let graph = G.create () in
+        Set.iter network ~f:(fun (city1, city2) ->
+          G.add_edge graph city1 city2);
+        Dot.output_graph
+          (Out_channel.create (File_path.to_string output_file))
+          graph;
         printf !"Done! Wrote dot file to %{File_path}\n%!" output_file]
 ;;
 

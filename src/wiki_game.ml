@@ -56,12 +56,46 @@ let print_links_command =
         List.iter (get_linked_articles contents) ~f:print_endline]
 ;;
 
+
+module Article = struct
+  type t = {title:string; url: string} [@@deriving compare, sexp, equal, hash]
+
+end
+
+module G = Graph.Imperative.Graph.Concrete (Article)
+
+(* We extend our [Graph] structure with the [Dot] API so that we can easily
+   render constructed graphs. Documentation about this API can be found here:
+   https://github.com/backtracking/ocamlgraph/blob/master/src/dot.mli *)
+module Dot = Graph.Graphviz.Dot (struct
+    include G
+
+    (* These functions can be changed to tweak the appearance of the
+       generated graph. Check out the ocamlgraph graphviz API
+       (https://github.com/backtracking/ocamlgraph/blob/master/src/graphviz.mli)
+       for examples of what values can be set here. *)
+    let edge_attributes _ = [ `Dir `None ]
+    let default_edge_attributes _ = []
+    let get_subgraph _ = None
+    let vertex_attributes (article: Article.t) = [ `Shape `Box; `Label article.title; `Fillcolor 1000 ]
+    let vertex_name (article: Article.t) = sprintf {|"%s"|} article.title
+    let default_vertex_attributes _ = []
+    let graph_attributes _ = []
+  end)
+
+
+let get_neighbors_at_level ~current_page = 
+  get_linked_articles current_page
+
 (* [visualize] should explore all linked articles up to a distance of [max_depth] away
    from the given [origin] article, and output the result as a DOT file. It should use the
    [how_to_fetch] argument along with [File_fetcher] to fetch the articles so that the
    implementation can be tested locally on the small dataset in the ../resources/wiki
    directory. *)
 let visualize ?(max_depth = 3) ~origin ~output_file ~how_to_fetch () : unit =
+  let graph = G.create () in
+  let visited = String.Hash_set.create ()
+
   ignore (max_depth : int);
   ignore (origin : string);
   ignore (output_file : File_path.t);

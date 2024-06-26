@@ -17,6 +17,8 @@ let create_grid input_file =
   List.map line_list ~f:(fun line -> String.split line)
 ;;
 
+let enumerate_row row_list =
+
 let solve_command =
   let open Command.Let_syntax in
   Command.basic

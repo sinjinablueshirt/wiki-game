@@ -56,13 +56,49 @@ let print_links_command =
         List.iter (get_linked_articles contents) ~f:print_endline]
 ;;
 
-
 module Article = struct
   type t = {title:string; url: string} [@@deriving compare, sexp, equal, hash]
+  let of_string article_string =
+    let tokens =  String.split article_string ~on:'/' in
+    {title=String.append (List.nth_exn tokens ((List.length tokens) -1)) " - Wikipedia"; url=article_string }
 
 end
 
+module Network = struct
+  (* We can represent our social network graph as a set of connections, where
+     a connection represents a friendship between two people. *)
+  module Connection = struct
+    module T = struct
+      type t = Article.t * Article.t [@@deriving compare, sexp]
+    end
+
+    (* This funky syntax is necessary to implement sets of [Connection.t]s.
+       This is needed to defined our [Network.t] type later. Using this
+       [Comparable.Make] functor also gives us immutable maps, which might
+       come in handy later. *)
+    include Comparable.Make (T)
+
+    ;;
+  end
+
+  type t = Connection.Set.t [@@deriving sexp_of]
+
+end
+
+let rec get_connections_from_path_list (article_list : Article.t list) =
+  (* gets all the connections aka all possible pairwise combinations of
+     elements *)
+  match List.length article_list with
+  | 0 | 1 -> []
+  | 2 ->
+    [ ( (List.hd_exn article_list)
+      ,(List.hd_exn (List.tl_exn article_list)) )
+    ]
+  | _ -> [List.hd_exn article_list, List.hd_exn (List.tl_exn article_list)] @ get_connections_from_path_list (List.tl_exn article_list)
+;;
+
 module G = Graph.Imperative.Graph.Concrete (Article)
+
 
 (* We extend our [Graph] structure with the [Dot] API so that we can easily
    render constructed graphs. Documentation about this API can be found here:
@@ -74,7 +110,7 @@ module Dot = Graph.Graphviz.Dot (struct
        generated graph. Check out the ocamlgraph graphviz API
        (https://github.com/backtracking/ocamlgraph/blob/master/src/graphviz.mli)
        for examples of what values can be set here. *)
-    let edge_attributes _ = [ `Dir `None ]
+    let edge_attributes _ = [ `Dir `Forward ]
     let default_edge_attributes _ = []
     let get_subgraph _ = None
     let vertex_attributes (article: Article.t) = [ `Shape `Box; `Label article.title; `Fillcolor 1000 ]
@@ -84,8 +120,16 @@ module Dot = Graph.Graphviz.Dot (struct
   end)
 
 
-let get_neighbors_at_level ~current_page = 
-  get_linked_articles current_page
+let get_neighbors_at_level ~current_page ~how_to_fetch = 
+  get_linked_articles (File_fetcher.fetch_exn how_to_fetch ~resource:current_page);;
+
+
+let not_already_visited (article_url:string) visited_set =
+    not
+      (Hash_set.exists visited_set ~f:(fun article_in_set ->
+         Article.equal (Article.of_string article_in_set) (Article.of_string article_url))) (* change to Article.equal *)
+  ;;
+
 
 (* [visualize] should explore all linked articles up to a distance of [max_depth] away
    from the given [origin] article, and output the result as a DOT file. It should use the
@@ -94,13 +138,22 @@ let get_neighbors_at_level ~current_page =
    directory. *)
 let visualize ?(max_depth = 3) ~origin ~output_file ~how_to_fetch () : unit =
   let graph = G.create () in
-  let visited = String.Hash_set.create ()
-
-  ignore (max_depth : int);
-  ignore (origin : string);
-  ignore (output_file : File_path.t);
-  ignore (how_to_fetch : File_fetcher.How_to_fetch.t);
-  failwith "TODO"
+  let original_article = Article.of_string origin in
+  let visited = String.Hash_set.create () in (* strings representing articles titles *)
+  let () = Hash_set.add visited origin in
+  let rec traverse depth (current_node:Article.t) =
+    (match depth=0 with
+    | true -> []
+    | false -> let neighbors = get_neighbors_at_level ~current_page:current_node.url ~how_to_fetch in
+    let connection_neighbors = List.map neighbors ~f:(fun neighbor -> current_node, Article.of_string neighbor) in
+    List.iter neighbors ~f:(Hash_set.add visited);
+    connection_neighbors@(List.concat_map neighbors ~f:(fun neighbor -> traverse (depth-1) (Article.of_string neighbor))))
+  in
+    let list_of_connections = traverse max_depth original_article in
+    let connection_set = Network.Connection.Set.of_list list_of_connections in
+    Set.iter connection_set ~f:(fun (art1, art2) -> G.add_edge graph art1 art2);
+    Dot.output_graph (Out_channel.create (File_path.to_string output_file))
+    graph;
 ;;
 
 let visualize_command =
@@ -172,3 +225,33 @@ let command =
     ; "find-path", find_path_command
     ]
 ;;
+
+
+
+
+
+let _diff_visualize ?(max_depth = 3) ~origin ~output_file ~how_to_fetch () : unit =
+  let graph = G.create () in
+  let original_article = Article.of_string origin in
+  let visited = String.Hash_set.create () in (* strings representing articles titles *)
+  let rec traverse depth (current_node:Article.t) =
+    (match depth<0 with
+    | true -> [[]]
+    | false -> let neighbors = get_neighbors_at_level ~current_page:current_node.url ~how_to_fetch in
+    let filtered_neighbors = List.filter neighbors ~f:(fun article -> not_already_visited article visited) in 
+    List.iter filtered_neighbors ~f:(Hash_set.add visited);
+    List.map filtered_neighbors ~f:(fun neighbor -> (List.concat_map (traverse (depth-1) (Article.of_string neighbor)) ~f:(fun path_from_neighbor -> [current_node]@path_from_neighbor))))
+  in
+    let list_of_paths = traverse max_depth original_article in
+    let list_of_connections = List.concat (List.map list_of_paths ~f:(get_connections_from_path_list)) in
+    let connection_set = Network.Connection.Set.of_list list_of_connections in
+    Set.iter connection_set ~f:(fun (art1, art2) -> G.add_edge graph art1 art2);
+    Dot.output_graph (Out_channel.create (File_path.to_string output_file))
+    graph;
+;;
+
+
+
+
+(* let filtered_neighbors = List.filter neighbors ~f:(fun article -> not_already_visited article visited) in  *)
+(* List.map neighbors ~f:(fun neighbor -> (List.concat_map (traverse (depth-1) (Article.of_string neighbor)) ~f:(fun path_from_neighbor -> connection_neighbors@path_from_neighbor)))) *)

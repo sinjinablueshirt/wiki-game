@@ -85,7 +85,7 @@ module Network = struct
 
 end
 
-let rec get_connections_from_path_list (article_list : Article.t list) =
+let rec _get_connections_from_path_list (article_list : Article.t list) =
   (* gets all the connections aka all possible pairwise combinations of
      elements *)
   match List.length article_list with
@@ -94,7 +94,7 @@ let rec get_connections_from_path_list (article_list : Article.t list) =
     [ ( (List.hd_exn article_list)
       ,(List.hd_exn (List.tl_exn article_list)) )
     ]
-  | _ -> [List.hd_exn article_list, List.hd_exn (List.tl_exn article_list)] @ get_connections_from_path_list (List.tl_exn article_list)
+  | _ -> [List.hd_exn article_list, List.hd_exn (List.tl_exn article_list)] @ _get_connections_from_path_list (List.tl_exn article_list)
 ;;
 
 module G = Graph.Imperative.Graph.Concrete (Article)
@@ -119,15 +119,20 @@ module Dot = Graph.Graphviz.Dot (struct
     let graph_attributes _ = []
   end)
 
+  let correct_url url (how_to_fetch :File_fetcher.How_to_fetch.t) = 
+    match how_to_fetch with
+    | Local _ -> url
+    | Remote -> if not (String.is_prefix ~prefix:"https://en.wikipedia.org/" url) then "https://en.wikipedia.org/" ^ url else url;;
 
-let get_neighbors_at_level ~current_page ~how_to_fetch = 
-  get_linked_articles (File_fetcher.fetch_exn how_to_fetch ~resource:current_page);;
+
+    let get_neighbors_at_level ~current_page ~how_to_fetch = 
+      get_linked_articles (File_fetcher.fetch_exn how_to_fetch ~resource:(correct_url current_page how_to_fetch));;
 
 
-let not_already_visited (article_url:string) visited_set =
+let not_already_visited (article_url:string) visited_set ~how_to_fetch =
     not
       (Hash_set.exists visited_set ~f:(fun article_in_set ->
-         Article.equal (Article.of_string article_in_set) (Article.of_string article_url))) (* change to Article.equal *)
+         String.equal article_in_set (Article.of_string (correct_url article_url how_to_fetch)).title)) (* change to Article.equal *)
   ;;
 
 
@@ -181,6 +186,7 @@ let visualize_command =
         printf !"Done! Wrote dot file to %{File_path}\n%!" output_file]
 ;;
 
+
 (* [find_path] should attempt to find a path between the origin article and the
    destination article via linked articles.
 
@@ -189,13 +195,34 @@ let visualize_command =
    the ../resources/wiki directory.
 
    [max_depth] is useful to limit the time the program spends exploring the graph. *)
-let find_path ?(max_depth = 3) ~origin ~destination ~how_to_fetch () =
-  ignore (max_depth : int);
-  ignore (origin : string);
-  ignore (destination : string);
-  ignore (how_to_fetch : File_fetcher.How_to_fetch.t);
-  failwith "TODO"
-;;
+
+  let bfs_find_path ?(max_depth = 3) ~origin ~destination ~how_to_fetch () =
+    let original_article =  Article.of_string (correct_url origin how_to_fetch) in
+    let visited = String.Hash_set.create () in
+    let () =  Hash_set.add visited original_article.title in
+    let to_visit = Queue.create () in
+    Queue.enqueue to_visit [original_article];
+    let rec traverse () =
+      (match Queue.dequeue to_visit with
+      | None -> None
+      | Some article_path -> match ((List.length article_path) - max_depth = 0) with
+      | true -> None
+      | false ->
+        let last_article = List.nth_exn article_path ((List.length article_path)-1) in
+        print_endline ("TITLE:  " ^ last_article.title);
+        if (String.equal (Article.of_string (correct_url last_article.url how_to_fetch)).title (Article.of_string (correct_url destination how_to_fetch)).title) then Some article_path else (
+        Hash_set.add visited last_article.title;
+        let neighbors = get_neighbors_at_level ~current_page:last_article.url ~how_to_fetch in
+        let filtered_neighbors = List.filter neighbors ~f:(fun art -> (not_already_visited (correct_url art how_to_fetch) visited ~how_to_fetch))
+      in
+      List.iter filtered_neighbors ~f:(Hash_set.add visited);
+      List.iter filtered_neighbors ~f:(fun neighbor -> Queue.enqueue to_visit (article_path@[Article.of_string (correct_url neighbor how_to_fetch)]));
+      traverse ();
+      )
+
+      ) in
+      traverse ()
+    
 
 let find_path_command =
   let open Command.Let_syntax in
@@ -212,9 +239,11 @@ let find_path_command =
           ~doc:"INT maximum length of path to search for (default 10)"
       in
       fun () ->
-        match find_path ~max_depth ~origin ~destination ~how_to_fetch () with
+        match bfs_find_path ~max_depth ~origin ~destination ~how_to_fetch () with
         | None -> print_endline "No path found!"
-        | Some trace -> List.iter trace ~f:print_endline]
+        | Some trace -> 
+          let new_trace = List.map trace ~f:(fun article -> article.url) in
+          List.iter new_trace ~f:print_endline]
 ;;
 
 let command =
@@ -226,32 +255,3 @@ let command =
     ]
 ;;
 
-
-
-
-
-let _diff_visualize ?(max_depth = 3) ~origin ~output_file ~how_to_fetch () : unit =
-  let graph = G.create () in
-  let original_article = Article.of_string origin in
-  let visited = String.Hash_set.create () in (* strings representing articles titles *)
-  let rec traverse depth (current_node:Article.t) =
-    (match depth<0 with
-    | true -> [[]]
-    | false -> let neighbors = get_neighbors_at_level ~current_page:current_node.url ~how_to_fetch in
-    let filtered_neighbors = List.filter neighbors ~f:(fun article -> not_already_visited article visited) in 
-    List.iter filtered_neighbors ~f:(Hash_set.add visited);
-    List.map filtered_neighbors ~f:(fun neighbor -> (List.concat_map (traverse (depth-1) (Article.of_string neighbor)) ~f:(fun path_from_neighbor -> [current_node]@path_from_neighbor))))
-  in
-    let list_of_paths = traverse max_depth original_article in
-    let list_of_connections = List.concat (List.map list_of_paths ~f:(get_connections_from_path_list)) in
-    let connection_set = Network.Connection.Set.of_list list_of_connections in
-    Set.iter connection_set ~f:(fun (art1, art2) -> G.add_edge graph art1 art2);
-    Dot.output_graph (Out_channel.create (File_path.to_string output_file))
-    graph;
-;;
-
-
-
-
-(* let filtered_neighbors = List.filter neighbors ~f:(fun article -> not_already_visited article visited) in  *)
-(* List.map neighbors ~f:(fun neighbor -> (List.concat_map (traverse (depth-1) (Article.of_string neighbor)) ~f:(fun path_from_neighbor -> connection_neighbors@path_from_neighbor)))) *)

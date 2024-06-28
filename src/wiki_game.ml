@@ -209,14 +209,12 @@ let visualize_command =
       | true -> None
       | false ->
         let last_article = List.nth_exn article_path ((List.length article_path)-1) in
-        print_endline ("TITLE:  " ^ last_article.title);
-        if (String.equal (Article.of_string (correct_url last_article.url how_to_fetch)).title (Article.of_string (correct_url destination how_to_fetch)).title) then Some article_path else (
-        Hash_set.add visited last_article.title;
         let neighbors = get_neighbors_at_level ~current_page:last_article.url ~how_to_fetch in
         let filtered_neighbors = List.filter neighbors ~f:(fun art -> (not_already_visited (correct_url art how_to_fetch) visited ~how_to_fetch))
       in
-      List.iter filtered_neighbors ~f:(Hash_set.add visited);
       List.iter filtered_neighbors ~f:(fun neighbor -> Queue.enqueue to_visit (article_path@[Article.of_string (correct_url neighbor how_to_fetch)]));
+        if (String.equal (Article.of_string (correct_url last_article.url how_to_fetch)).title (Article.of_string (correct_url destination how_to_fetch)).title) then Some article_path else (
+        Hash_set.add visited last_article.title;
       traverse ();
       )
 
@@ -239,11 +237,22 @@ let find_path_command =
           ~doc:"INT maximum length of path to search for (default 10)"
       in
       fun () ->
-        match bfs_find_path ~max_depth ~origin ~destination ~how_to_fetch () with
+        (* bfs pre-processing things *)
+let start_time = Time_now.nanoseconds_since_unix_epoch () in
+match bfs_find_path ~max_depth ~origin ~destination ~how_to_fetch () with
+| None -> print_endline "No path found!"
+| Some trace ->
+  let new_trace = List.map trace ~f:(fun article -> article.url) in
+  let end_time = Time_now.nanoseconds_since_unix_epoch () in
+  let time_taken = Base.Int63.( - ) end_time start_time in
+  print_s
+    [%message (new_trace : string list) ~time_taken: (Float.( / ) (Float.of_int63 time_taken) (Float.of_int 1000000000) : Float.t)]]
+
+        (* match bfs_find_path ~max_depth ~origin ~destination ~how_to_fetch () with
         | None -> print_endline "No path found!"
         | Some trace -> 
           let new_trace = List.map trace ~f:(fun article -> article.url) in
-          List.iter new_trace ~f:print_endline]
+          List.iter new_trace ~f:print_endline] *)
 ;;
 
 let command =
